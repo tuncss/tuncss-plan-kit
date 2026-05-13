@@ -1,6 +1,6 @@
 {
   "name": "tuncss-plan-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "main": ".opencode/plugins/tuncss-plan-kit.js",
   "description": "Three-skill kit for spec-driven development: brainstorm an idea into a spec, turn the spec into an executable plan, hand the plan off to another LLM agent.",
@@ -31,6 +31,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tuncss/tuncss-plan-kit"
+    "url": "git+https://github.com/tuncss/tuncss-plan-kit.git"
   }
 }

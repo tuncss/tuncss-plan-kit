@@ -300,11 +300,14 @@ function installOpenCodeGlobal() {
   );
 
   // 2. npm install in ocDir
-  const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
-  const npmRes = spawnSync(npmCmd, ["install", "--silent", "--no-audit", "--no-fund"], {
+  // Pass the full command as a single string with shell: true to avoid the
+  // Node DEP0190 warning about unescaped args concatenation. Args are all
+  // hardcoded here so there's no injection surface.
+  const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
+  const npmRes = spawnSync(`${npmBin} install --silent --no-audit --no-fund`, {
     cwd: ocDir,
     stdio: "inherit",
-    shell: process.platform === "win32",
+    shell: true,
   });
   if (npmRes.status !== 0) {
     throw new Error(

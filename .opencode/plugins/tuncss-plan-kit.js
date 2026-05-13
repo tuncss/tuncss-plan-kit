@@ -4,22 +4,23 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const skillsDir = path.resolve(__dirname, "../../skills");
 
+// Minimal templates: just pass the user's input through. The skill's
+// `description` frontmatter is what triggers the model to invoke the skill
+// when relevant — we don't force-load it from the wrapper, which would
+// dump the full SKILL.md body into the chat in OpenCode's UI.
 const WRAPPERS = {
   brainstorm: {
     description: "Turn an idea into an approved spec",
-    template:
-      "Use the `brainstorm` skill to handle the following request:\n\n$ARGUMENTS\n",
+    template: "$ARGUMENTS\n",
   },
   "plan-universal": {
     description: "Turn an approved spec into an executable implementation plan",
-    template:
-      "Use the `plan-universal` skill to handle the following request:\n\n$ARGUMENTS\n",
+    template: "$ARGUMENTS\n",
   },
   "handoff-plan": {
     description:
       "Generate a paste-ready handoff message for another LLM agent to execute the plan",
-    template:
-      "Use the `handoff-plan` skill to handle the following request:\n\n$ARGUMENTS\n",
+    template: "$ARGUMENTS\n",
   },
 };
 
