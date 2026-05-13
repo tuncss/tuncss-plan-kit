@@ -1,0 +1,36 @@
+{
+  "name": "tuncss-plan-kit",
+  "version": "0.1.0",
+  "type": "module",
+  "main": ".opencode/plugins/tuncss-plan-kit.js",
+  "description": "Three-skill kit for spec-driven development: brainstorm an idea into a spec, turn the spec into an executable plan, hand the plan off to another LLM agent.",
+  "bin": {
+    "tuncss-plan-kit": "bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "skills/",
+    "commands/",
+    "templates/",
+    ".opencode/",
+    "README.md"
+  ],
+  "keywords": [
+    "claude-code",
+    "claude",
+    "skills",
+    "brainstorming",
+    "planning",
+    "spec-driven",
+    "llm-agents"
+  ],
+  "author": "tuncss",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tuncss/tuncss-plan-kit"
+  }
+}
