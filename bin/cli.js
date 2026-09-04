@@ -3,12 +3,10 @@
 import fs from "fs";
 import path from "path";
 import os from "os";
-import { spawnSync } from "child_process";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PKG_ROOT = path.resolve(__dirname, "..");
-const PKG_NAME = "tuncss-plan-kit";
 
 const SKILLS = ["brainstorm", "plan-universal", "handoff-plan", "changelog"];
 const COMMANDS = ["brainstorm", "plan-universal", "handoff-plan", "changelog"];
@@ -44,18 +42,6 @@ const PLATFORMS = {
       instructionsFile: path.join(home, ".codex", "AGENTS.md"),
     }),
     commandsSrc: "codex",
-  },
-  opencode: {
-    label: "opencode",
-    project: {
-      skillsDir: ".opencode/skills",
-      commandsDir: ".opencode/commands",
-      instructionsFile: "AGENTS.md",
-    },
-    // Global install for OpenCode uses the npm-plugin route, not file-drop.
-    // See installOpenCodeGlobal().
-    global: null,
-    commandsSrc: "opencode",
   },
   // Antigravity reads .agents/ in a workspace and ~/.gemini/config/ globally.
   // One global location serves all three variants (desktop app, agy CLI, IDE).
@@ -109,17 +95,14 @@ Usage:
   npx tuncss-plan-kit init [--target=<list>] [--global] [--force]
 
 Commands:
-  init      Install the three skills (brainstorm, plan-universal, handoff-plan)
-            into the target platform(s).
+  init      Install the four skills (brainstorm, plan-universal, handoff-plan,
+            changelog) into the target platform(s).
 
 Options:
   --target  Comma-separated platforms to install for. Supported:
-              claude, codex, opencode, antigravity, all
+              claude, codex, antigravity, all
             If omitted, auto-detects from the current directory.
   --global  Install to user-wide locations.
-            For OpenCode this uses the npm-plugin route (installs the package
-            into ~/.config/opencode/node_modules/ and registers it in
-            opencode.json's plugin array).
   --force   Overwrite existing skill/command files without warning.
             (Instruction-file marker blocks are always idempotent.)
 
@@ -146,16 +129,12 @@ function detectTargets(cwd) {
     found.add("claude");
   }
   if (exists(path.join(cwd, ".codex"))) found.add("codex");
-  if (exists(path.join(cwd, ".opencode"))) found.add("opencode");
   // Antigravity discovers .agents/ and reads AGENTS.md as rules. Its project
   // paths are a subset of Codex's, so adding it here costs no extra files.
   if (exists(path.join(cwd, ".agents"))) found.add("antigravity");
   if (exists(path.join(cwd, "AGENTS.md"))) {
     found.add("antigravity");
-    if (!found.has("codex") && !found.has("opencode")) {
-      found.add("codex");
-      found.add("opencode");
-    }
+    if (!found.has("codex")) found.add("codex");
   }
   return [...found];
 }
@@ -297,105 +276,6 @@ function installPlatform({ platform, isGlobal, force, baseRoot, sharedState }) {
   return lines;
 }
 
-function readJsonOrDefault(filePath, fallback) {
-  if (!exists(filePath)) return fallback;
-  try {
-    return JSON.parse(fs.readFileSync(filePath, "utf8"));
-  } catch {
-    return fallback;
-  }
-}
-
-function writeJson(filePath, obj) {
-  ensureDir(path.dirname(filePath));
-  fs.writeFileSync(filePath, JSON.stringify(obj, null, 2) + "\n");
-}
-
-function isRunningFromInstalledPackage() {
-  // If our package root contains /node_modules/, we were installed as a dep
-  // (e.g. via `npm install -g` or `npx`). Otherwise we're being run from
-  // source (dev mode).
-  return PKG_ROOT.split(path.sep).includes("node_modules");
-}
-
-function dependencySpec() {
-  // When running from a published install, use a version range so npm
-  // installs from the registry. When running from source (dev), point to
-  // our absolute path with file: so changes are picked up without publish.
-  if (isRunningFromInstalledPackage()) {
-    return `^${readJsonOrDefault(path.join(PKG_ROOT, "package.json"), { version: "0.1.0" }).version || "0.1.0"}`;
-  }
-  return "file:" + PKG_ROOT.split(path.sep).join("/");
-}
-
-function installOpenCodeGlobal() {
-  const home = os.homedir();
-  const ocDir = path.join(home, ".config", "opencode");
-  ensureDir(ocDir);
-  const lines = [];
-
-  // 1. package.json — add or update tuncss-plan-kit dependency
-  const pkgPath = path.join(ocDir, "package.json");
-  const pkg = readJsonOrDefault(pkgPath, {});
-  pkg.dependencies = pkg.dependencies || {};
-  const spec = dependencySpec();
-  const prevSpec = pkg.dependencies[PKG_NAME];
-  pkg.dependencies[PKG_NAME] = spec;
-  writeJson(pkgPath, pkg);
-  lines.push(
-    `  ${prevSpec === spec ? "·" : prevSpec ? "↻" : "✓"} ${relPath(pkgPath, home)} (dep: ${PKG_NAME}@${spec})`
-  );
-
-  // 2. npm install in ocDir
-  // Pass the full command as a single string with shell: true to avoid the
-  // Node DEP0190 warning about unescaped args concatenation. Args are all
-  // hardcoded here so there's no injection surface.
-  const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
-  const npmRes = spawnSync(`${npmBin} install --silent --no-audit --no-fund`, {
-    cwd: ocDir,
-    stdio: "inherit",
-    shell: true,
-  });
-  if (npmRes.status !== 0) {
-    throw new Error(
-      `npm install failed in ${ocDir} (exit code ${npmRes.status}). Fix the error above and re-run.`
-    );
-  }
-  lines.push(`  ✓ npm install ran in ${relPath(ocDir, home)}`);
-
-  // 3. command wrappers — file-drop into ~/.config/opencode/commands/
-  // (the plugin handles skills via config injection, but command discovery
-  // appears to require file-drop)
-  const cmdDir = path.join(ocDir, "commands");
-  for (const cmd of COMMANDS) {
-    const src = path.join(PKG_ROOT, "commands", "opencode", `${cmd}.md`);
-    const dest = path.join(cmdDir, `${cmd}.md`);
-    const r = copyFile(src, dest, false);
-    lines.push(`  ${statusTag(r.status)} ${relPath(r.dest, home)}`);
-  }
-
-  // 4. opencode.json — add plugin reference (idempotent)
-  const ocJsonPath = path.join(ocDir, "opencode.json");
-  const ocJson = readJsonOrDefault(ocJsonPath, {
-    $schema: "https://opencode.ai/config.json",
-  });
-  ocJson.plugin = ocJson.plugin || [];
-  // Normalize to strings only (we don't use the [string, object] tuple form)
-  const pluginPath = `~/.config/opencode/node_modules/${PKG_NAME}`;
-  const alreadyHas = ocJson.plugin.some(
-    (p) => p === pluginPath || (Array.isArray(p) && p[0] === pluginPath)
-  );
-  if (!alreadyHas) {
-    ocJson.plugin.push(pluginPath);
-  }
-  writeJson(ocJsonPath, ocJson);
-  lines.push(
-    `  ${alreadyHas ? "·" : "✓"} ${relPath(ocJsonPath, home)} (plugin: ${pluginPath})`
-  );
-
-  return lines;
-}
-
 function init(args) {
   const cwd = process.cwd();
 
@@ -439,19 +319,14 @@ function init(args) {
 
   for (const platform of targets) {
     console.log(`[${platform}]`);
-    if (platform === "opencode" && args.global) {
-      const lines = installOpenCodeGlobal();
-      for (const l of lines) console.log(l);
-    } else {
-      const lines = installPlatform({
-        platform,
-        isGlobal: args.global,
-        force: args.force,
-        baseRoot: cwd,
-        sharedState,
-      });
-      for (const l of lines) console.log(l);
-    }
+    const lines = installPlatform({
+      platform,
+      isGlobal: args.global,
+      force: args.force,
+      baseRoot: cwd,
+      sharedState,
+    });
+    for (const l of lines) console.log(l);
     console.log("");
   }
 
