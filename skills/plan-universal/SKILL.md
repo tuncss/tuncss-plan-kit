@@ -37,8 +37,9 @@ Every plan starts with this header:
 > 1. Read **only** that task's block. Do not preview other tasks.
 > 2. Stay strictly inside its **Targets** — do not edit files outside that list.
 > 3. Follow the **Implementation Notes**; do not invent extra scope.
-> 4. When **Done When** and **Verification** are satisfied, **stop and report**. Wait for approval before moving to the next task.
-> 5. If verification fails, report the failure and stop. Do not attempt fixes outside the task's Targets.
+> 4. When **Done When** and **Verification** are satisfied, write the changelog entry (rule 6), then **stop and report**. Wait for approval before moving to the next task.
+> 5. If verification fails, report the failure and stop. Do not attempt fixes outside the task's Targets, and do not write a changelog entry.
+> 6. **Changelog entry:** use the `changelog` skill to append this task's entry to `docs/CHANGELOG.md`. Base it on the actual diff, not on what you set out to do.
 
 **Goal:** <one sentence>
 

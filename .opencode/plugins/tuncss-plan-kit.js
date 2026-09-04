@@ -22,6 +22,10 @@ const WRAPPERS = {
       "Generate a paste-ready handoff message for another LLM agent to execute the plan",
     template: "$ARGUMENTS\n",
   },
+  changelog: {
+    description: "Record what changed in docs/CHANGELOG.md",
+    template: "$ARGUMENTS\n",
+  },
 };
 
 export const TuncssPlanKitPlugin = async () => ({

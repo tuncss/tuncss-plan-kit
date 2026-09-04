@@ -1,12 +1,13 @@
 # tuncss-plan-kit
 
-Three skills for spec-driven development, installable into Claude Code, Codex CLI, and OpenCode:
+Four skills for spec-driven development, installable into Claude Code, Codex CLI, and OpenCode:
 
 - **`/brainstorm`** — turn an idea into an approved spec (`docs/specs/`)
 - **`/plan-universal`** — turn a spec into an executable plan (`docs/plans/`)
 - **`/handoff-plan`** — generate a paste-ready briefing for another LLM agent to execute the plan (`docs/handoffs/`)
+- **`/changelog`** — record what changed, in plain sentences (`docs/CHANGELOG.md`)
 
-No agents, no routing, no TDD ceremony. Just three skills that get you from idea → spec → plan → handoff.
+No agents, no routing, no TDD ceremony. Just four skills that get you from idea → spec → plan → handoff, and a record of what actually changed.
 
 ## Install
 
@@ -69,8 +70,8 @@ Agent:   ↓ writing-plans skill
          Done When / Verification
 
 You:     do TASK-01
-Agent:   reads only TASK-01's block, stays inside its Targets, stops for
-         approval when done
+Agent:   reads only TASK-01's block, stays inside its Targets, writes the
+         changelog entry to docs/CHANGELOG.md, stops for approval when done
 
 — or —
 
@@ -87,8 +88,9 @@ Every plan starts with this contract:
 > 1. Read **only** that task's block. Do not preview other tasks.
 > 2. Stay strictly inside its **Targets** — do not edit files outside that list.
 > 3. Follow the **Implementation Notes**; do not invent extra scope.
-> 4. When **Done When** and **Verification** are satisfied, **stop and report**. Wait for approval.
-> 5. If verification fails, report and stop. Do not attempt fixes outside the task's Targets.
+> 4. When **Done When** and **Verification** are satisfied, write the changelog entry (rule 6), then **stop and report**. Wait for approval before moving to the next task.
+> 5. If verification fails, report the failure and stop. Do not attempt fixes outside the task's Targets, and do not write a changelog entry.
+> 6. **Changelog entry:** use the `changelog` skill to append this task's entry to `docs/CHANGELOG.md`. Base it on the actual diff, not on what you set out to do.
 
 Tasks are tagged with model tiers (T1 Fast / T2 Balanced / T3 Power / T4 Reasoning) so you can route execution to the cheapest model that can do the job.
 
@@ -106,7 +108,7 @@ npx tuncss-plan-kit init [--target=<list>] [--global] [--force]
 
 ## Why this exists
 
-Existing kits ship dozens of agents and skills you'll never use, but every one of them sits in your context and burns tokens each turn. `tuncss-plan-kit` ships three files that cover the only loop most projects need: design → plan → execute (here or elsewhere). That's it.
+Existing kits ship dozens of agents and skills you'll never use, but every one of them sits in your context and burns tokens each turn. `tuncss-plan-kit` ships four files that cover the only loop most projects need: design → plan → execute (here or elsewhere) → record. That's it.
 
 ## License
 

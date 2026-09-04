@@ -63,8 +63,9 @@ You're picking up an implementation plan in this repo.
 1. When I ask for a task ("do TASK-03"), read **only** that task's block in the plan.
 2. Stay strictly inside its **Targets** — don't edit files outside that list.
 3. Follow the **Implementation Notes**; don't invent extra scope.
-4. When **Done When** and **Verification** are satisfied, **stop and report**. Wait for my approval before moving on.
-5. If verification fails, report and stop. Don't attempt fixes outside the task's Targets.
+4. When **Done When** and **Verification** are satisfied, write the changelog entry (rule 6), then **stop and report**. Wait for my approval before moving on.
+5. If verification fails, report and stop. Don't attempt fixes outside the task's Targets, and don't write a changelog entry.
+6. **Changelog entry:** use the `changelog` skill to append this task's entry to `docs/CHANGELOG.md`. Base it on the actual diff, not on what you set out to do.
 
 Start by reading `<plan path>` end-to-end, then wait for me to ask for the first task. Don't begin TASK-01 until I ask.
 ````
@@ -72,6 +73,6 @@ Start by reading `<plan path>` end-to-end, then wait for me to ask for the first
 ## Rules
 
 - Don't summarize task bodies. The receiving agent reads the plan file itself.
-- Don't reformat the execution contract beyond the 5 numbered rules above. They are the contract; the plan file is the source of truth.
+- Don't reformat the execution contract beyond the 6 numbered rules above. They are the contract; the plan file is the source of truth.
 - Keep the message under ~50 lines. If you're tempted to add more context, you're inlining the plan — stop.
 - Don't include this skill's name, your model name, or any Claude-specific framing in the output. The receiver doesn't need to know how the message was generated.

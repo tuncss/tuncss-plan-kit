@@ -10,8 +10,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PKG_ROOT = path.resolve(__dirname, "..");
 const PKG_NAME = "tuncss-plan-kit";
 
-const SKILLS = ["brainstorm", "plan-universal", "handoff-plan"];
-const COMMANDS = ["brainstorm", "plan-universal", "handoff-plan"];
+const SKILLS = ["brainstorm", "plan-universal", "handoff-plan", "changelog"];
+const COMMANDS = ["brainstorm", "plan-universal", "handoff-plan", "changelog"];
 const MARKER_START = "<!-- tuncss-plan-kit:start -->";
 const MARKER_END = "<!-- tuncss-plan-kit:end -->";
 
@@ -178,6 +178,24 @@ function upsertMarkerBlock(filePath, blockBody) {
   ensureDir(path.dirname(filePath));
   fs.writeFileSync(filePath, existing + sep + block + "\n");
   return { status: existing.length === 0 ? "file-created" : "block-appended" };
+}
+
+const GITATTRIBUTES_LINE = "docs/CHANGELOG.md merge=union";
+
+// Three people appending changelog entries on separate branches all touch the
+// same lines of docs/CHANGELOG.md. The union merge driver keeps both sides
+// instead of raising a conflict on every merge.
+function ensureGitattributes(baseRoot) {
+  const filePath = path.join(baseRoot, ".gitattributes");
+  let existing = "";
+  if (exists(filePath)) existing = fs.readFileSync(filePath, "utf8");
+  if (existing.split(/\r?\n/).some((l) => l.trim() === GITATTRIBUTES_LINE)) {
+    return { status: "unchanged", dest: filePath };
+  }
+  const sep = existing.length === 0 || existing.endsWith("\n") ? "" : "\n";
+  ensureDir(path.dirname(filePath));
+  fs.writeFileSync(filePath, existing + sep + GITATTRIBUTES_LINE + "\n");
+  return { status: existing.length === 0 ? "written" : "updated", dest: filePath };
 }
 
 function loadInstructionsBlock() {
@@ -404,6 +422,13 @@ function init(args) {
       });
       for (const l of lines) console.log(l);
     }
+    console.log("");
+  }
+
+  if (!args.global) {
+    const r = ensureGitattributes(cwd);
+    console.log(`[git]`);
+    console.log(`  ${statusTag(r.status)} .gitattributes (${GITATTRIBUTES_LINE})`);
     console.log("");
   }
 

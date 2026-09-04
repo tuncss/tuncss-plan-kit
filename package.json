@@ -1,9 +1,9 @@
 {
   "name": "tuncss-plan-kit",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
   "main": ".opencode/plugins/tuncss-plan-kit.js",
-  "description": "Three-skill kit for spec-driven development: brainstorm an idea into a spec, turn the spec into an executable plan, hand the plan off to another LLM agent.",
+  "description": "Four-skill kit for spec-driven development: brainstorm an idea into a spec, turn the spec into an executable plan, hand the plan off to another LLM agent, and record what changed.",
   "bin": {
     "tuncss-plan-kit": "bin/cli.js"
   },
