@@ -1,6 +1,6 @@
 # tuncss-plan-kit
 
-Four skills for spec-driven development, installable into Claude Code, Codex CLI, and OpenCode:
+Four skills for spec-driven development, installable into Claude Code, Codex CLI, OpenCode, and Antigravity:
 
 - **`/brainstorm`** — turn an idea into an approved spec (`docs/specs/`)
 - **`/plan-universal`** — turn a spec into an executable plan (`docs/plans/`)
@@ -24,7 +24,8 @@ The installer auto-detects which platform(s) the project uses and writes the rig
 | `.claude/` or `CLAUDE.md` | Claude Code |
 | `.codex/` | Codex CLI |
 | `.opencode/` | OpenCode |
-| `AGENTS.md` (alone) | Both Codex and OpenCode (they share `AGENTS.md`) |
+| `.agents/` | Antigravity |
+| `AGENTS.md` (alone) | Codex, OpenCode, and Antigravity (they share `AGENTS.md`) |
 
 If nothing is detected, pass an explicit target:
 
@@ -45,14 +46,21 @@ Restart your coding agent after install so it picks up the new skills and slash 
 | Claude Code | `.claude/skills/<n>/SKILL.md` | *(none — skills auto-expose as slash)* | `CLAUDE.md` |
 | Codex CLI | `.agents/skills/<n>/SKILL.md` | `.codex/prompts/<n>.md` | `AGENTS.md` |
 | OpenCode | `.opencode/skills/<n>/SKILL.md` | `.opencode/commands/<n>.md` | `AGENTS.md` |
+| Antigravity | `.agents/skills/<n>/SKILL.md` | *(none — skills auto-expose as slash)* | `AGENTS.md` |
 
-Claude Code automatically exposes any skill named `foo` as `/foo`, so the kit doesn't write wrapper command files for it. Codex and OpenCode don't auto-expose, so wrappers are written there to give you the same `/brainstorm`, `/plan-universal`, `/handoff-plan` UX everywhere.
+Claude Code and Antigravity automatically expose any skill named `foo` as `/foo`, so the kit doesn't write wrapper command files for them. Codex and OpenCode don't auto-expose, so wrappers are written there to give you the same `/brainstorm`, `/plan-universal`, `/handoff-plan`, `/changelog` UX everywhere.
 
-With `--global` the same files go to user-wide locations (`~/.claude/`, `~/.agents/`, `~/.codex/`).
+Antigravity and Codex share `.agents/skills/`, so installing both writes those files once — the second platform reports them as already written.
+
+Note: `agy changelog` is Antigravity's own built-in subcommand for release notes. The kit's `/changelog` is a slash command inside the agent session — same word, different place.
+
+With `--global` the same files go to user-wide locations (`~/.claude/`, `~/.agents/`, `~/.codex/`, `~/.gemini/config/`).
 
 **OpenCode `--global` is supported via an npm-plugin route**: the kit installs itself into `~/.config/opencode/node_modules/`, registers itself in `~/.config/opencode/opencode.json`'s `plugin` array, and drops command wrappers into `~/.config/opencode/commands/`. After install, restart OpenCode — skills appear in every project. (For Claude and Codex, `--global` is a plain file copy.)
 
-Project-local is still the default for all three — recommended unless you specifically want the kit available everywhere.
+**Antigravity `--global` is a plain file copy to `~/.gemini/config/`** — a single location the desktop app, the `agy` CLI, and the IDE all read, so one install covers them all.
+
+Project-local is still the default for all four — recommended unless you specifically want the kit available everywhere.
 
 ## Workflow
 
@@ -102,7 +110,7 @@ npx tuncss-plan-kit init [--target=<list>] [--global] [--force]
 
 | Flag | Effect |
 |------|--------|
-| `--target=<list>` | Comma-separated. Values: `claude`, `codex`, `opencode`, `all`. Auto-detected if omitted. |
+| `--target=<list>` | Comma-separated. Values: `claude`, `codex`, `opencode`, `antigravity`, `all`. Auto-detected if omitted. |
 | `--global` | Install to user-wide locations instead of the current project. |
 | `--force` | Overwrite existing skill/command files without warning. |
 

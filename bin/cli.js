@@ -57,6 +57,25 @@ const PLATFORMS = {
     global: null,
     commandsSrc: "opencode",
   },
+  // Antigravity reads .agents/ in a workspace and ~/.gemini/config/ globally.
+  // One global location serves all three variants (desktop app, agy CLI, IDE).
+  // Like Claude Code, it expands skills into slash commands on its own, so no
+  // wrapper files are written.
+  antigravity: {
+    label: "antigravity",
+    project: {
+      skillsDir: ".agents/skills",
+      commandsDir: null,
+      instructionsFile: "AGENTS.md",
+    },
+    global: (home) => ({
+      skillsDir: path.join(home, ".gemini", "config", "skills"),
+      commandsDir: null,
+      instructionsFile: path.join(home, ".gemini", "config", "AGENTS.md"),
+    }),
+    commandsSrc: null,
+    skipCommands: true,
+  },
 };
 
 const SUPPORTED = Object.keys(PLATFORMS);
@@ -95,7 +114,7 @@ Commands:
 
 Options:
   --target  Comma-separated platforms to install for. Supported:
-              claude, codex, opencode, all
+              claude, codex, opencode, antigravity, all
             If omitted, auto-detects from the current directory.
   --global  Install to user-wide locations.
             For OpenCode this uses the npm-plugin route (installs the package
@@ -128,7 +147,11 @@ function detectTargets(cwd) {
   }
   if (exists(path.join(cwd, ".codex"))) found.add("codex");
   if (exists(path.join(cwd, ".opencode"))) found.add("opencode");
+  // Antigravity discovers .agents/ and reads AGENTS.md as rules. Its project
+  // paths are a subset of Codex's, so adding it here costs no extra files.
+  if (exists(path.join(cwd, ".agents"))) found.add("antigravity");
   if (exists(path.join(cwd, "AGENTS.md"))) {
+    found.add("antigravity");
     if (!found.has("codex") && !found.has("opencode")) {
       found.add("codex");
       found.add("opencode");
@@ -233,7 +256,13 @@ function installPlatform({ platform, isGlobal, force, baseRoot, sharedState }) {
   for (const skill of SKILLS) {
     const src = path.join(PKG_ROOT, "skills", skill, "SKILL.md");
     const dest = path.join(paths.skillsDir, skill, "SKILL.md");
+    // Codex and Antigravity share .agents/skills; don't copy the same file twice.
+    if (sharedState.writtenSkillFiles.has(dest)) {
+      lines.push(`  · ${relPath(dest, displayBase)} (already written this run)`);
+      continue;
+    }
     const r = copyFile(src, dest, force);
+    sharedState.writtenSkillFiles.add(dest);
     lines.push(`  ${statusTag(r.status)} ${relPath(r.dest, displayBase)}`);
   }
 
@@ -405,6 +434,7 @@ function init(args) {
   const sharedState = {
     instructionsBlock: loadInstructionsBlock(),
     writtenInstructionFiles: new Set(),
+    writtenSkillFiles: new Set(),
   };
 
   for (const platform of targets) {
