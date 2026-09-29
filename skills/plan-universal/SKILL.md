@@ -55,17 +55,6 @@ Every plan starts with this header:
 ---
 ````
 
-## Model tiers
-
-Every task gets a recommended tier. These are the cost/capability brackets for the model that should execute it:
-
-- **T1 — Fast:** trivial edits, renames, formatting, single-file boilerplate
-- **T2 — Balanced:** standard feature work in one component, contained logic
-- **T3 — Power:** multi-file changes, non-trivial logic, refactors with consequence
-- **T4 — Reasoning:** architecture decisions, gnarly debugging, cross-cutting design
-
-When in doubt, pick the lower tier. Upgrades are cheap; over-spending isn't.
-
 ## Task structure
 
 Every task uses this shape:
@@ -77,13 +66,12 @@ Every task uses this shape:
 - `exact/path/to/file.ts` (create | modify | delete)
 - `exact/path/to/other.ts` (modify)
 
-**Model Tier:** T2  <!-- T1 Fast | T2 Balanced | T3 Power | T4 Reasoning -->
-
 **Implementation Notes:**
 - What this task does, in plain language
 - Any non-obvious decision and why
-- Concrete code, types, function signatures, or commands the engineer needs — not "implement the handler" but the actual handler shape
-- If a public interface from an earlier task is consumed here, restate its signature; don't make the reader page back
+- The contract the executor can't guess: types, function signatures, commands, config keys. Write code bodies only for logic that is genuinely non-obvious (an algorithm, a regex, a query, a tricky edge case) — the executor writes the rest
+- Point to existing code instead of copying it: "follow the handler pattern in `src/routes/users.ts:40`"
+- If a public interface from an earlier task is consumed here, restate its signature only; don't make the reader page back
 
 **Done When:**
 - Bullet list of observable outcomes
@@ -117,7 +105,7 @@ These are **plan failures**. Never write them:
 - "Add appropriate error handling" / "validate input" / "handle edge cases" — name the cases
 - "Write tests for the above" without the actual test names and what they assert
 - "Similar to TASK-N" — repeat what's needed; the executor reads tasks out of order
-- Steps that describe *what* without showing *how* — if a task changes code, show the code shape, the type, or the exact command
+- Steps that describe *what* without pointing to *how* — name the existing file to follow, the signature, or the exact command; don't paste whole function bodies the executor can write itself
 - References to types, functions, or files not defined in any task or in the file map
 
 ## Self-review

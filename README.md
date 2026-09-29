@@ -70,7 +70,7 @@ You:     (review and approve)
 You:     /plan-universal
 Agent:   ↓ writing-plans skill
          writes plan to docs/plans/ with execution contract at the top,
-         tasks shaped as Targets / Model Tier / Implementation Notes /
+         tasks shaped as Targets / Implementation Notes /
          Done When / Verification
 
 You:     do TASK-01
@@ -96,7 +96,7 @@ Every plan starts with this contract:
 > 5. If verification fails, report the failure and stop. Do not attempt fixes outside the task's Targets, and do not write a changelog entry.
 > 6. **Changelog entry:** use the `changelog` skill to append this task's entry to `docs/CHANGELOG.md`. Base it on the actual diff, not on what you set out to do.
 
-Tasks are tagged with model tiers (T1 Fast / T2 Balanced / T3 Power / T4 Reasoning) so you can route execution to the cheapest model that can do the job.
+Plans carry contracts (types, signatures, commands) and pointers to existing code, not pasted function bodies — the executor writes the code.
 
 ## Options
 

@@ -108,7 +108,7 @@ Wait for their response. If they ask for changes, make them and re-run the self-
 
 ## Hand-off
 
-After the spec is approved, **do NOT start implementing**. The skill ends here. The next step is `/plan-universal`, which turns the spec into an executable plan with model-tier hints and per-task verification.
+After the spec is approved, **do NOT start implementing**. The skill ends here. The next step is `/plan-universal`, which turns the spec into an executable plan with per-task verification.
 
 End your final turn with this message to the user (paraphrase, but keep all four parts):
 
