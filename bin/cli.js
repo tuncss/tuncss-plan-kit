@@ -101,7 +101,8 @@ Commands:
 Options:
   --target  Comma-separated platforms to install for. Supported:
               claude, codex, antigravity, all
-            If omitted, auto-detects from the current directory.
+            If omitted, auto-detects from the current directory
+            (or from your home directory with --global).
   --global  Install to user-wide locations.
   --force   Overwrite existing skill/command files without warning.
             (Instruction-file marker blocks are always idempotent.)
@@ -137,6 +138,16 @@ function detectTargets(cwd) {
     if (!found.has("codex")) found.add("codex");
   }
   return [...found];
+}
+
+// With --global the project directory says nothing about which agents the user
+// runs; their home directory does.
+function detectGlobalTargets(home) {
+  const found = [];
+  if (exists(path.join(home, ".claude"))) found.push("claude");
+  if (exists(path.join(home, ".codex"))) found.push("codex");
+  if (exists(path.join(home, ".gemini", "config"))) found.push("antigravity");
+  return found;
 }
 
 function ensureDir(dir) {
@@ -284,10 +295,10 @@ function init(args) {
     targets = SUPPORTED.slice();
   }
   if (!targets) {
-    targets = detectTargets(cwd);
+    targets = args.global ? detectGlobalTargets(os.homedir()) : detectTargets(cwd);
     if (targets.length === 0) {
       console.error(
-        "No supported platform detected in this directory.\n" +
+        `No supported platform detected in ${args.global ? "your home directory" : "this directory"}.\n` +
           "Specify one explicitly, e.g.: npx tuncss-plan-kit init --target=claude\n" +
           "Or install for all three: npx tuncss-plan-kit init --target=all"
       );

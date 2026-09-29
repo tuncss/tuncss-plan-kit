@@ -54,7 +54,9 @@ Note: `agy changelog` is Antigravity's own built-in subcommand for release notes
 
 With `--global` the same files go to user-wide locations (`~/.claude/`, `~/.agents/`, `~/.codex/`, `~/.gemini/config/`).
 
-**Antigravity `--global` is a plain file copy to `~/.gemini/config/`** — a single location the desktop app, the `agy` CLI, and the IDE all read, so one install covers them all.
+**Antigravity `--global` is a plain file copy to `~/.gemini/config/`** — a single location the desktop app, the `agy` CLI, and the IDE all read, so one install covers them all. (Antigravity's docs list `~/.gemini/antigravity-cli/skills/` for the CLI, but in practice `agy` reads `~/.gemini/config/skills/` and ignores that folder, so the kit writes only the one.)
+
+`npx tuncss-plan-kit init --global` with no `--target` looks at your home directory instead of the current one and installs for every agent it finds: `~/.claude/` → Claude Code, `~/.codex/` → Codex CLI, `~/.gemini/config/` → Antigravity.
 
 Project-local is still the default for all three — recommended unless you specifically want the kit available everywhere.
 
@@ -106,7 +108,7 @@ npx tuncss-plan-kit init [--target=<list>] [--global] [--force]
 
 | Flag | Effect |
 |------|--------|
-| `--target=<list>` | Comma-separated. Values: `claude`, `codex`, `antigravity`, `all`. Auto-detected if omitted. |
+| `--target=<list>` | Comma-separated. Values: `claude`, `codex`, `antigravity`, `all`. Auto-detected if omitted (from the current directory, or from your home directory with `--global`). |
 | `--global` | Install to user-wide locations instead of the current project. |
 | `--force` | Overwrite existing skill/command files without warning. |
 
