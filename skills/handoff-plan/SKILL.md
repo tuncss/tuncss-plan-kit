@@ -43,7 +43,35 @@ Do not echo the message contents — the user will open the file.
 ## Message template
 
 ````text
-You're picking up an implementation plan in this repo.
+You're executing an approved implementation plan in this repo.
+
+<!-- EXECUTION CONTRACT — read before touching any task -->
+> **Default: run every task in order, from TASK-01 to the last, without stopping between tasks.**
+> If the user names a single task ("do TASK-03"), do only that task, then stop.
+> If the user names a starting task ("run from TASK-04"), start there and continue in order.
+> This plan is already approved. Do not write your own plan or task list — execute this one.
+>
+> **Before the first task:** run `git status`. If the working tree is not clean, stop (S4).
+>
+> **For each task:**
+> 1. Read only that task's block. Do not preview later tasks.
+> 2. Edit only the files in its **Targets**.
+> 3. Follow its **Implementation Notes**; add no extra scope.
+> 4. Run its **Verification**. If it fails, make one fix attempt inside Targets and run it again.
+> 5. When **Done When** and **Verification** pass: append the changelog entry with the `changelog`
+>    skill (from the actual diff), then commit the task's changes and the entry together.
+> 6. **Commit message:** Turkish, ASCII only — write c, s, i, g, o, u instead of ç, ş, ı, ğ, ö, ü.
+>    First line `TASK-NN: <what changed>`, under 72 characters. Say what changed, not "dosyalar guncellendi".
+>    Example: `TASK-03: Oturum suresi 24 saatten 2 saate dusuruldu`
+>
+> **Stop and report when:**
+> - S1: Verification fails a second time.
+> - S2: A file, function, API, flag, or command the task names does not exist or differs from the description. Do not guess.
+> - S3: Finishing the task requires editing a file outside its Targets.
+> - S4: The working tree was not clean before the first task.
+>
+> On stop: no changelog entry and no commit for that task; earlier commits stay. Report the task id, the condition (S1–S4), and what you saw.
+> After the last task: report the list of commits made.
 
 **Project:** <project name> — <one-line description>
 
@@ -59,20 +87,12 @@ You're picking up an implementation plan in this repo.
 - TASK-02: <name>
 - ...
 
-**How to execute (full execution contract is at the top of the plan file):**
-1. When I ask for a task ("do TASK-03"), read **only** that task's block in the plan.
-2. Stay strictly inside its **Targets** — don't edit files outside that list.
-3. Follow the **Implementation Notes**; don't invent extra scope.
-4. When **Done When** and **Verification** are satisfied, write the changelog entry (rule 6), then **stop and report**. Wait for my approval before moving on.
-5. If verification fails, report and stop. Don't attempt fixes outside the task's Targets, and don't write a changelog entry.
-6. **Changelog entry:** use the `changelog` skill to append this task's entry to `docs/CHANGELOG.md`. Base it on the actual diff, not on what you set out to do.
-
-Start by reading `<plan path>` end-to-end, then wait for me to ask for the first task. Don't begin TASK-01 until I ask.
+Start now: open `<plan path>`, read the header and TASK-01's block, and begin. Continue through every task in order until the last one is done or a stop condition (S1–S4) is hit.
 ````
 
 ## Rules
 
 - Don't summarize task bodies. The receiving agent reads the plan file itself.
-- Don't reformat the execution contract beyond the 6 numbered rules above. They are the contract; the plan file is the source of truth.
-- Keep the message under ~50 lines. If you're tempted to add more context, you're inlining the plan — stop.
+- Don't reformat the execution contract. It is copied verbatim from the plan-universal header; the plan file is the source of truth.
+- Keep the message under ~60 lines, not counting the task list. If you're tempted to add more context, you're inlining the plan — stop.
 - Don't include this skill's name, your model name, or any Claude-specific framing in the output. The receiver doesn't need to know how the message was generated.

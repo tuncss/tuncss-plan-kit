@@ -8,3 +8,8 @@
 - Commit mesajı kuralı eklendi: Türkçe, ASCII, ilk satır `TASK-NN: <ne değişti>`
 - Self-review listesi 5 → 7 madde: kendiliğinden biten doğrulama, task sırası, referansların repoda var olması
 - Plan sonrası mesaj "taskları tek tek iste" → "'run the plan' de, tek task için 'do TASK-01', devretmek için `/handoff-plan`"
+
+### Contract-first handoff message — TASK-02 · tuncss · [plan](docs/plans/2026-10-10-autonomous-execution.md)
+- Handoff mesajı artık plandaki kontratın birebir kopyasıyla başlıyor; eski 6 maddelik "How to execute" özeti kaldırıldı
+- Son satır "planı baştan sona oku, ilk task'ı isteyene kadar bekle" → "başlığı ve TASK-01'i oku, başla, S1–S4'e kadar sırayla devam et"
+- Mesaj uzunluk sınırı ~50 → ~60 satır, görev listesi sayıma dahil değil
