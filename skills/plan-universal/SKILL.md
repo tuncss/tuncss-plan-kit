@@ -33,13 +33,32 @@ Every plan starts with this header:
 # <Feature Name> — Implementation Plan
 
 <!-- EXECUTION CONTRACT — read before touching any task -->
-> When the user asks for a specific task (e.g. "do TASK-03"):
-> 1. Read **only** that task's block. Do not preview other tasks.
-> 2. Stay strictly inside its **Targets** — do not edit files outside that list.
-> 3. Follow the **Implementation Notes**; do not invent extra scope.
-> 4. When **Done When** and **Verification** are satisfied, write the changelog entry (rule 6), then **stop and report**. Wait for approval before moving to the next task.
-> 5. If verification fails, report the failure and stop. Do not attempt fixes outside the task's Targets, and do not write a changelog entry.
-> 6. **Changelog entry:** use the `changelog` skill to append this task's entry to `docs/CHANGELOG.md`. Base it on the actual diff, not on what you set out to do.
+> **Default: run every task in order, from TASK-01 to the last, without stopping between tasks.**
+> If the user names a single task ("do TASK-03"), do only that task, then stop.
+> If the user names a starting task ("run from TASK-04"), start there and continue in order.
+> This plan is already approved. Do not write your own plan or task list — execute this one.
+>
+> **Before the first task:** run `git status`. If the working tree is not clean, stop (S4).
+>
+> **For each task:**
+> 1. Read only that task's block. Do not preview later tasks.
+> 2. Edit only the files in its **Targets**.
+> 3. Follow its **Implementation Notes**; add no extra scope.
+> 4. Run its **Verification**. If it fails, make one fix attempt inside Targets and run it again.
+> 5. When **Done When** and **Verification** pass: append the changelog entry with the `changelog`
+>    skill (from the actual diff), then commit the task's changes and the entry together.
+> 6. **Commit message:** Turkish, ASCII only — write c, s, i, g, o, u instead of ç, ş, ı, ğ, ö, ü.
+>    First line `TASK-NN: <what changed>`, under 72 characters. Say what changed, not "dosyalar guncellendi".
+>    Example: `TASK-03: Oturum suresi 24 saatten 2 saate dusuruldu`
+>
+> **Stop and report when:**
+> - S1: Verification fails a second time.
+> - S2: A file, function, API, flag, or command the task names does not exist or differs from the description. Do not guess.
+> - S3: Finishing the task requires editing a file outside its Targets.
+> - S4: The working tree was not clean before the first task.
+>
+> On stop: no changelog entry and no commit for that task; earlier commits stay. Report the task id, the condition (S1–S4), and what you saw.
+> After the last task: report the list of commits made.
 
 **Goal:** <one sentence>
 
@@ -83,7 +102,7 @@ Every task uses this shape:
 - Automated (optional): <test files, scripts, or `npm test -- foo` commands and expected output, only if automated coverage genuinely belongs here>
 ````
 
-Tasks are self-contained because the executor reads exactly one block per turn (see the Execution Contract). If TASK-07 needs the shape of something defined in TASK-02, restate it in TASK-07 — don't make the reader scroll.
+Tasks are self-contained because the executor reads exactly one block at a time (see the Execution Contract). If TASK-07 needs the shape of something defined in TASK-02, restate it in TASK-07 — don't make the reader scroll.
 
 ## Granularity
 
@@ -107,6 +126,7 @@ These are **plan failures**. Never write them:
 - "Similar to TASK-N" — repeat what's needed; the executor reads tasks out of order
 - Steps that describe *what* without pointing to *how* — name the existing file to follow, the signature, or the exact command; don't paste whole function bodies the executor can write itself
 - References to types, functions, or files not defined in any task or in the file map
+- References you haven't verified — every file, function, command, flag, and config key in Implementation Notes either exists in the repo (open it and check while writing the plan) or is created by an earlier task's Targets. If you can't confirm it, don't write it.
 
 ## Self-review
 
@@ -116,12 +136,14 @@ After the plan is written, re-read it against the spec with fresh eyes. Fix issu
 2. **Placeholder scan** — anything from the "No placeholders" list? Fix.
 3. **Name and type consistency** — a function called `clearLayers()` in TASK-03 but `clearFullLayers()` in TASK-07 is a bug. Same for types, file paths, env vars, table names.
 4. **Targets isolation** — does any task's Targets list overlap awkwardly with another in a way that will force out-of-order edits? If so, resequence or merge.
-5. **Verification reality** — every Done When has a corresponding Verification step that an engineer can actually run.
+5. **Verification reality** — every Done When has a corresponding Verification step that an engineer can actually run. Every Verification command terminates on its own — no watch mode, no dev server left running; the executor runs tasks back to back and a hung command blocks the whole run.
+6. **Order** — each task may assume only that earlier tasks are done. The executor runs them top to bottom.
+7. **References exist** — every path, function, and command named in a task exists in the repo or is created by an earlier task.
 
 ## After the plan
 
 Save the plan, commit it, and tell the user:
 
-> Plan saved to `<path>` and committed. To execute, ask for tasks one at a time (e.g. "do TASK-01") — I'll stay inside that task's Targets and stop for approval before moving on, per the execution contract at the top of the plan. Or, if you want to hand this off to another LLM agent, run `/handoff-plan`.
+> Plan saved to `<path>` and committed. To execute every task in order, say "run the plan" — I'll commit after each task and stop only on a stop condition (S1–S4). To run a single task, say "do TASK-01". To hand it to another LLM agent, run `/handoff-plan`.
 
-Do not start implementing in the same turn. Wait for the user to request the first task.
+Do not start implementing in the same turn. Wait for the user to say how to run it.
