@@ -13,3 +13,8 @@
 - Handoff mesajı artık plandaki kontratın birebir kopyasıyla başlıyor; eski 6 maddelik "How to execute" özeti kaldırıldı
 - Son satır "planı baştan sona oku, ilk task'ı isteyene kadar bekle" → "başlığı ve TASK-01'i oku, başla, S1–S4'e kadar sırayla devam et"
 - Mesaj uzunluk sınırı ~50 → ~60 satır, görev listesi sayıma dahil değil
+
+### Align changelog skill and instructions block — TASK-03 · tuncss · [plan](docs/plans/2026-10-10-autonomous-execution.md)
+- Changelog skill'indeki kontrat referansı "Rule 6" → "Step 5"
+- Changelog skill'ine, plan çalışmasında girdinin task değişiklikleriyle aynı commit'e kontrat tarafından alındığı notu eklendi
+- Kurulumda CLAUDE.md/AGENTS.md'ye yazılan özet "task'ı yap, dur, raporla" → "varsayılan olarak tüm taskları sırayla yap, her task sonrası changelog + commit, S1–S4'te dur"

@@ -11,7 +11,7 @@ Append a short, concrete record of what changed to `docs/CHANGELOG.md`. The read
 
 ## Two ways in
 
-**From a completed plan task.** Rule 6 of the plan's execution contract sends you here once Done When and Verification are satisfied. You have the task id, the task name, and the plan path.
+**From a completed plan task.** Step 5 of the plan's execution contract sends you here once Done When and Verification are satisfied. You have the task id, the task name, and the plan path.
 
 **From `/changelog`.** The user invoked it directly for work done outside the plan flow. There is no task id and no plan path.
 
@@ -92,4 +92,4 @@ Placement rule — follow it exactly, so that three people's agents do not grow 
 
 ## Do not commit
 
-Leave the entry in the working tree next to the change. Whoever commits the work commits the entry with it, so `git log -p docs/CHANGELOG.md` always pairs a line with the change that produced it.
+Leave the entry in the working tree next to the change. Whoever commits the work commits the entry with it, so `git log -p docs/CHANGELOG.md` always pairs a line with the change that produced it. In a plan run, the execution contract commits the task's changes and this entry together right after you finish.

@@ -8,5 +8,5 @@ This project uses tuncss-plan-kit. Four slash commands are available:
 - `/handoff-plan` — generate a paste-ready handoff for another LLM agent (writes to `docs/handoffs/`)
 - `/changelog` — record what changed, in plain sentences (writes to `docs/CHANGELOG.md`)
 
-Plans contain an execution contract at the top. When asked for a specific task ("do TASK-03"), read only that task's block, stay inside its Targets, write the changelog entry, then stop and report when Done When + Verification are satisfied.
+Plans contain an execution contract at the top. By default, run every task in order: after each task passes its Verification, write the changelog entry and commit; stop only on a stop condition (S1–S4). "do TASK-03" runs only that task.
 <!-- tuncss-plan-kit:end -->
