@@ -18,3 +18,8 @@
 - Changelog skill'indeki kontrat referansı "Rule 6" → "Step 5"
 - Changelog skill'ine, plan çalışmasında girdinin task değişiklikleriyle aynı commit'e kontrat tarafından alındığı notu eklendi
 - Kurulumda CLAUDE.md/AGENTS.md'ye yazılan özet "task'ı yap, dur, raporla" → "varsayılan olarak tüm taskları sırayla yap, her task sonrası changelog + commit, S1–S4'te dur"
+
+### README and v0.7.0 — TASK-04 · tuncss · [plan](docs/plans/2026-10-10-autonomous-execution.md)
+- README Workflow adımı "do TASK-01, onay için dur" → "run the plan, her task sonrası commit, yalnızca S1–S4'te dur"
+- README "What's in a plan" bölümündeki 6 kural yeni kontratın tam metniyle değiştirildi, Türkçe ASCII commit notu eklendi
+- Paket sürümü 0.6.0 → 0.7.0

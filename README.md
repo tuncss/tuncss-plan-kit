@@ -75,28 +75,51 @@ Agent:   ↓ writing-plans skill
          tasks shaped as Targets / Implementation Notes /
          Done When / Verification
 
-You:     do TASK-01
-Agent:   reads only TASK-01's block, stays inside its Targets, writes the
-         changelog entry to docs/CHANGELOG.md, stops for approval when done
+You:     run the plan
+Agent:   runs every task in order; after each one it writes the changelog
+         entry to docs/CHANGELOG.md and commits; stops only on a stop
+         condition (S1–S4) and reports where and why
 
 — or —
 
 You:     /handoff-plan
 Agent:   ↓ handoff skill
-         writes a short briefing to docs/handoffs/ that you can paste
-         into another agent (or feed it the file path)
+         writes a briefing to docs/handoffs/ — the execution contract on
+         top — that you can paste into another agent
 ```
 
 ## What's in a plan
 
 Every plan starts with this contract:
 
-> 1. Read **only** that task's block. Do not preview other tasks.
-> 2. Stay strictly inside its **Targets** — do not edit files outside that list.
-> 3. Follow the **Implementation Notes**; do not invent extra scope.
-> 4. When **Done When** and **Verification** are satisfied, write the changelog entry (rule 6), then **stop and report**. Wait for approval before moving to the next task.
-> 5. If verification fails, report the failure and stop. Do not attempt fixes outside the task's Targets, and do not write a changelog entry.
-> 6. **Changelog entry:** use the `changelog` skill to append this task's entry to `docs/CHANGELOG.md`. Base it on the actual diff, not on what you set out to do.
+> **Default: run every task in order, from TASK-01 to the last, without stopping between tasks.**
+> If the user names a single task ("do TASK-03"), do only that task, then stop.
+> If the user names a starting task ("run from TASK-04"), start there and continue in order.
+> This plan is already approved. Do not write your own plan or task list — execute this one.
+>
+> **Before the first task:** run `git status`. If the working tree is not clean, stop (S4).
+>
+> **For each task:**
+> 1. Read only that task's block. Do not preview later tasks.
+> 2. Edit only the files in its **Targets**.
+> 3. Follow its **Implementation Notes**; add no extra scope.
+> 4. Run its **Verification**. If it fails, make one fix attempt inside Targets and run it again.
+> 5. When **Done When** and **Verification** pass: append the changelog entry with the `changelog`
+>    skill (from the actual diff), then commit the task's changes and the entry together.
+> 6. **Commit message:** Turkish, ASCII only — write c, s, i, g, o, u instead of ç, ş, ı, ğ, ö, ü.
+>    First line `TASK-NN: <what changed>`, under 72 characters. Say what changed, not "dosyalar guncellendi".
+>    Example: `TASK-03: Oturum suresi 24 saatten 2 saate dusuruldu`
+>
+> **Stop and report when:**
+> - S1: Verification fails a second time.
+> - S2: A file, function, API, flag, or command the task names does not exist or differs from the description. Do not guess.
+> - S3: Finishing the task requires editing a file outside its Targets.
+> - S4: The working tree was not clean before the first task.
+>
+> On stop: no changelog entry and no commit for that task; earlier commits stay. Report the task id, the condition (S1–S4), and what you saw.
+> After the last task: report the list of commits made.
+
+Commit messages are Turkish, ASCII only — the kit's team writes them that way.
 
 Plans carry contracts (types, signatures, commands) and pointers to existing code, not pasted function bodies — the executor writes the code.
 
